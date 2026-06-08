@@ -93,6 +93,17 @@ pub fn full_board_valid(board: &Board) -> bool {
     true
 }
 
+pub fn board_is_complete(board: &Board) -> bool{
+    for i in 0..9 {
+        for j in 0..9 {
+            if board[i][j] == 0 {
+                return false;
+            }
+        }
+    }
+    true
+}
+
 pub fn print_board(board: &Board) {
     for row in board {
         for cell in row {

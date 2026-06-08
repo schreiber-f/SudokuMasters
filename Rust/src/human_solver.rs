@@ -1,79 +1,15 @@
-use crate::board::Board;
+use crate::board::{Board, board_is_complete};
+use crate::candidates::{compute_candidates};
 use crate::strategies::singles::{apply_naked_single, apply_hidden_single};
-pub type Candidates = [[u16; 9]; 9];
-const ALL_CANDIDATES: u16 = 0x1FF;
-const SOLVED: u16 = 0;
-
-pub fn compute_candidates(board: &Board) -> Candidates {
-    let mut candidates = [[ALL_CANDIDATES; 9]; 9];
-
-    for row in 0..9 {
-        for col in 0..9 {
-            let val = board[row][col];
-
-            if val > 0{
-
-                update_candidates_after_placement(&mut candidates, row, col, val)
-
-            }
-        }
-    }
-    candidates
-}
+use crate::strategies::{Technique};
+use std::collections::HashMap;
 
 
-pub fn update_candidates_after_placement(candidates: &mut Candidates, row:usize, col:usize, val:u8){
-    candidates[row][col] = SOLVED;
-
-    let remove_mask = !(1 << (val - 1));
-
-    for i in 0..9 {
-        if i != col { candidates[row][i] &= remove_mask; }
-        if i != row { candidates[i][col] &= remove_mask; }
-    }
-
-    let box_row_start = (row / 3) * 3;
-    let box_col_start = (col / 3) * 3;
-
-    for r in box_row_start..box_row_start + 3 {
-        for c in box_col_start..box_col_start + 3 {
-            if r != row || c != col {
-                candidates[r][c] &= remove_mask;
-            }
-        }
-    }
-}
-
-
-pub fn apply_value(board: &mut Board, candidates: &mut Candidates, row:usize, col:usize, val:u8) {
-    if board[row][col] != 0 {
-        return;
-    }
-
-    update_candidates_after_placement(candidates, row, col, val);
-
-    board[row][col] = val;
-}
-
-pub fn count_bits(mask: u16) -> u32{
-    mask.count_ones()
-}
-
-pub fn single_candidate(mask: u16) -> Option<u8> {
-    let bits_count = count_bits(mask);
-    if bits_count == 1 {
-        let val = mask.trailing_zeros() + 1;
-        Some(val as u8)
-    }else {
-        None
-    }
-}
-
+#[derive(Debug)]
 pub struct SolveReport{
     pub solved_board: Board,
     pub is_solved: bool,
-
-
+    pub technique_counts: HashMap<Technique, usize>,
 }
 
 
@@ -81,15 +17,33 @@ pub fn human_solve(board: &mut Board) -> SolveReport{
     let mut candidates =
         compute_candidates(board);
 
+    let mut counts = HashMap::new();
+
     loop {
         if apply_naked_single(board, &mut candidates) {
-            continue;
-        }
+            *counts
+                .entry(Technique::NakedSingle)
+                .or_insert(0) += 1;
 
-        if apply_hidden_single(board, &mut candidates) {
             continue;
         }
+        println!("no naked single found");
+        if apply_hidden_single(board, &mut candidates) {
+
+            *counts
+                .entry(Technique::HiddenSingle)
+                .or_insert(0) += 1;
+
+            continue;
+        }
+        println!("no hidden single found");
 
         break;
+    }
+
+    SolveReport {
+        solved_board: *board,
+        is_solved: board_is_complete(board),
+        technique_counts: counts,
     }
 }

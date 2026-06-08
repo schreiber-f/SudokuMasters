@@ -3,13 +3,15 @@ pub mod solver;
 pub mod generator;
 pub mod human_solver;
 pub mod strategies;
+pub mod candidates;
 
 #[cfg(test)]
 mod tests {
-    use crate::board::{is_valid, Board, print_board, full_board_valid};
-    use crate::solver::{find_empty, solve, count_solutions, has_unique_solution};
+    use crate::board::{is_valid, Board, print_board, full_board_valid, board_is_complete};
+    use crate::solver::{find_empty, solve, count_solutions, has_unique_solution, solve_random};
     use crate::generator::{count_givens, generate_full_board, dig_holes};
-    use crate::human_solver::{count_bits, single_candidate, compute_candidates, apply_value};
+    use crate::candidates::{count_bits, single_candidate, compute_candidates, apply_value};
+    use crate::human_solver::human_solve;
     use crate::strategies::singles::{apply_hidden_single, apply_naked_single};
     //use super::*;
 
@@ -452,5 +454,40 @@ mod tests {
             board[1][1],
             5
         );
+    }
+
+    #[test]
+    fn test_board_is_complete_true() {
+        let board = [[1u8; 9]; 9];
+
+        assert!(board_is_complete(&board));
+    }
+
+    #[test]
+    fn test_board_is_complete_false() {
+        let mut board = [[1u8; 9]; 9];
+
+        board[3][4] = 0;
+
+        assert!(!board_is_complete(&board));
+    }
+
+    #[test]
+    fn test_human_solver_singles() {
+        println!("testing human_solver_singles");
+        let mut board = generate_full_board();
+        println!("board before:");
+        print_board(&board);
+        dig_holes(&mut board, 35);
+
+        println!("board with holes:");
+        print_board(&board);
+
+        let report = human_solve(&mut board);
+
+        assert!(report.is_solved);
+        println!("board after:");
+        print_board(&board);
+        println!("solve report {:?}", report);
     }
 }

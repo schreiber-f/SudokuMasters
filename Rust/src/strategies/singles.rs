@@ -1,5 +1,5 @@
 use crate::board::{Board};
-use crate::human_solver::{apply_value, count_bits, single_candidate, Candidates};
+use crate::candidates::{apply_value, count_bits, single_candidate, Candidates};
 
 pub fn apply_naked_single(
     board: &mut Board,
