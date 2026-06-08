@@ -38,10 +38,12 @@ pub fn dig_holes(
     }
 
     let mut curr_filled_fields = count_givens(board);
+    filled_fields.shuffle(&mut rng);
 
-    while curr_filled_fields > target_givens && !filled_fields.is_empty(){
-        filled_fields.shuffle(&mut rng);
-        let (row, col) = filled_fields.pop().unwrap();
+    while curr_filled_fields > target_givens{
+        let Some((row, col)) = filled_fields.pop() else {
+            break;
+        };
         let old = board[row][col];
         board[row][col] = 0;
         if has_unique_solution(board) {
