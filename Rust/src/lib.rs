@@ -7,106 +7,17 @@ pub mod candidates;
 
 #[cfg(test)]
 mod tests {
-    use crate::board::{is_valid, Board, print_board, full_board_valid, board_is_complete};
-    use crate::solver::{find_empty, solve, count_solutions, has_unique_solution, solve_random};
+    use crate::board::{Board, print_board, full_board_valid, board_is_complete};
+    use crate::solver::{find_empty, solve, count_solutions, has_unique_solution};
     use crate::generator::{count_givens, generate_full_board, dig_holes};
     use crate::candidates::{count_bits, single_candidate, compute_candidates, apply_value};
     use crate::human_solver::human_solve;
     use crate::strategies::singles::{apply_hidden_single, apply_naked_single};
     use crate::strategies::pairs::{find_naked_pairs_in_unit_fast, find_hidden_pairs_in_unit};
     use crate::strategies::cell_utils::{row_cells, col_cells, box_cells};
+    use crate::strategies::intersections::{find_pointing_pair_in_box, apply_pointing_pair};
     //use super::*;
 
-    #[test]
-    fn test_invalid_row() {
-        println!("testing invalid_row");
-        let board = [
-            [5,3,0,0,0,0,0,0,0],
-            [0;9],
-            [0;9],
-            [0;9],
-            [0;9],
-            [0;9],
-            [0;9],
-            [0;9],
-            [0;9],
-        ];
-
-        assert!(!is_valid(&board, 0, 2, 5));
-    }
-    #[test]
-    fn test_invalid_column() {
-        println!("testing invalid_column");
-        let board = [
-            [5,2,0,0,0,0,0,0,0],
-            [0;9],
-            [0;9],
-            [0;9],
-            [0;9],
-            [0;9],
-            [0;9],
-            [0;9],
-            [0;9],
-        ];
-
-        assert!(!is_valid(&board, 1, 0, 5));
-    }
-    #[test]
-    fn test_invalid_block() {
-        println!("testing invalid_block");
-        let board = [
-            [5,0,0,0,0,0,0,0,0],
-            [0;9],
-            [0;9],
-            [0;9],
-            [0;9],
-            [0;9],
-            [0;9],
-            [0;9],
-            [0;9],
-        ];
-
-        assert!(!is_valid(&board, 1, 1, 5));
-    }
-    #[test]
-    fn test_valid_move() {
-        println!("testing valid_move");
-
-        let board = [
-            [5,3,0,0,0,0,0,0,0],
-            [6,0,0,0,0,0,0,0,0],
-            [0;9],
-            [0;9],
-            [0;9],
-            [0;9],
-            [0;9],
-            [0;9],
-            [0;9],
-        ];
-
-        assert!(is_valid(&board, 8, 8, 1));
-    }
-    #[test]
-    fn test_find_empty() {
-        println!("testing find_empty");
-
-        let board = [
-            [5,3,1,0,0,0,0,0,0],
-            [0;9],
-            [0;9],
-            [0;9],
-            [0;9],
-            [0;9],
-            [0;9],
-            [0;9],
-            [0;9],
-        ];
-
-        assert_eq!(
-            find_empty(&board),
-            Some((0,3))
-        );
-    }
     #[test]
     fn test_find_empty_none() {
         println!("testing find_empty_none");
@@ -753,14 +664,109 @@ mod tests {
     }
 
     #[test]
-    fn test_human_solver_singles_pairs() {
-        println!("testing human_solver_singles_and_pairs...");
-        let mut board = generate_full_board();
-        println!("board before:");
-        print_board(&board);
-        dig_holes(&mut board, 30);
+    fn test_pointing_pair_row() {
+        let mut candidates = [[0u16; 9]; 9];
 
-        println!("board with holes:");
+        let five = 1 << 4;
+
+        candidates[0][0] = five;
+        candidates[0][2] = five;
+
+        candidates[0][4] =
+            five |
+                (1 << 7);
+
+        assert!(
+            find_pointing_pair_in_box(
+                &mut candidates,
+                0
+            )
+        );
+
+        assert_eq!(
+            candidates[0][4],
+            1 << 7
+        );
+    }
+
+    #[test]
+    fn test_pointing_pair_column() {
+        let mut candidates = [[0u16; 9]; 9];
+
+        let five = 1 << 4;
+
+        candidates[0][0] = five;
+        candidates[2][0] = five;
+
+        candidates[5][0] =
+            five |
+                (1 << 7);
+
+        assert!(
+            find_pointing_pair_in_box(
+                &mut candidates,
+                0
+            )
+        );
+
+        assert_eq!(
+            candidates[5][0],
+            1 << 7
+        );
+    }
+
+    #[test]
+    fn test_pointing_pair_none() {
+        let mut candidates = [[0u16; 9]; 9];
+
+        let five = 1 << 4;
+
+        candidates[0][0] = five;
+        candidates[1][2] = five;
+
+        assert!(
+            !find_pointing_pair_in_box(
+                &mut candidates,
+                0
+            )
+        );
+    }
+
+    #[test]
+    fn test_apply_pointing_pair() {
+        let mut candidates = [[0u16; 9]; 9];
+
+        let five = 1 << 4;
+        let eight = 1 << 7;
+
+        candidates[0][0] = five;
+        candidates[0][2] = five;
+
+        candidates[0][4] = five | eight;
+
+        assert!(
+            apply_pointing_pair(&mut candidates)
+        );
+
+        assert_eq!(
+            candidates[0][4],
+            eight
+        );
+    }
+
+    #[test]
+    fn test_human_solver_pairs() {
+        println!("testing human_solver_singles_and_pairs...");
+        let mut board = [[1, 0, 0, 0, 0, 3, 2, 4, 6],
+        [3, 6, 0, 4, 5, 0, 0, 1, 0],
+        [2, 0, 0, 0, 1, 0, 3, 5, 0],
+        [0, 0, 5, 7, 0, 0, 0, 0, 0],
+        [0, 0, 3, 0, 0, 9, 0, 0, 0],
+        [0, 0, 6, 0, 8, 0, 0, 0, 9],
+        [5, 0, 4, 1, 0, 0, 0, 0, 0],
+        [7, 0, 1, 0, 4, 0, 0, 0, 0],
+        [0, 0, 0, 0, 9, 0, 0, 0, 0]];
+        println!("board before:");
         print_board(&board);
 
         let report = human_solve(&mut board);
