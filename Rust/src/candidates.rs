@@ -68,3 +68,17 @@ pub fn single_candidate(mask: u16) -> Option<u8> {
         None
     }
 }
+
+
+pub fn remove_candidates(
+    candidates: &mut Candidates,
+    row: usize,
+    col: usize,
+    mask: u16,
+) -> bool{
+    let old = candidates[row][col];
+
+    candidates[row][col] &= !mask;
+
+    old != candidates[row][col]
+}

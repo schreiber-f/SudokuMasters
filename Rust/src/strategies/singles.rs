@@ -35,38 +35,53 @@ pub fn apply_hidden_single(board: &mut Board, candidates: &mut Candidates) -> bo
             let mut mask_col = candidates[col][row];
 
             if board[row][col] == 0 {
-                if count_bits(mask) > 1 {
-                    while mask > 0 {
-                        let trailing = mask.trailing_zeros() as usize;
 
-                        counts_row[trailing] += 1;
-                        last_seen_row[trailing] = col as u8;
+                while mask > 0 {
+                    let trailing = mask.trailing_zeros() as usize;
 
-                        mask &= mask - 1;
-                    }
+                    counts_row[trailing] += 1;
+                    last_seen_row[trailing] = col as u8;
+
+                    mask &= mask - 1;
                 }
+
             }
             if board[col][row] == 0 {
-                if count_bits(mask_col) > 1 {
-                    while mask_col > 0 {
-                        let trailing = mask_col.trailing_zeros() as usize;
 
-                        counts_col[trailing] += 1;
-                        last_seen_col[trailing] = row as u8;
+                while mask_col > 0 {
+                    let trailing = mask_col.trailing_zeros() as usize;
 
-                        mask_col &= mask_col - 1;
-                    }
+                    counts_col[trailing] += 1;
+                    last_seen_col[trailing] = col as u8;
+
+                    mask_col &= mask_col - 1;
                 }
+
             }
         }
         for i in 0..9 {
             let val = (i + 1) as u8;
             if counts_row[i] == 1{
+                println!(
+                    "ROW hidden single: val={} row={} col={}",
+                    val,
+                    row,
+                    last_seen_row[i]
+                );
                 apply_value(board, candidates, row, last_seen_row[i] as usize, val);
+                println!("Changed field: {}", board[row][last_seen_row[i] as usize]);
+
                 return true;
             }
             if counts_col[i] == 1{
+                println!(
+                    "COL hidden single: val={} row={} col={}",
+                    val,
+                    last_seen_col[i],
+                    row
+                );
                 apply_value(board, candidates, last_seen_col[i] as usize, row, val);
+                println!("Changed field: {}", board[last_seen_col[i] as usize][row]);
                 return true;
             }
         }
