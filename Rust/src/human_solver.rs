@@ -2,7 +2,9 @@ use crate::board::{Board, board_is_complete};
 use crate::candidates::{compute_candidates};
 use crate::strategies::singles::{apply_naked_single, apply_hidden_single};
 use crate::strategies::pairs::{apply_naked_pair, apply_hidden_pair};
+use crate::strategies::triples::{apply_naked_triple, apply_hidden_triple};
 use crate::strategies::intersections::{apply_pointing_pair, apply_box_line_reduction};
+use crate::strategies::fish::{apply_x_wing};
 use crate::strategies::{Technique};
 use std::collections::HashMap;
 
@@ -74,6 +76,33 @@ pub fn human_solve(board: &mut Board) -> SolveReport{
 
             continue;
         }
+
+        if apply_naked_triple(&mut candidates) {
+            *counts
+                .entry(Technique::NakedTriple)
+                .or_insert(0) += 1;
+
+            continue;
+        }
+        println!("no naked triple found");
+
+        if apply_hidden_triple(&mut candidates) {
+            *counts
+                .entry(Technique::HiddenTriple)
+                .or_insert(0) += 1;
+
+            continue;
+        }
+        println!("no hidden triple found");
+
+        if apply_x_wing(&mut candidates) {
+            *counts
+                .entry(Technique::XWing)
+                .or_insert(0) += 1;
+
+            continue;
+        }
+        println!("no X-Wing found");
 
         break;
     }

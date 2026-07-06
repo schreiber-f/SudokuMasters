@@ -82,3 +82,34 @@ pub fn remove_candidates(
 
     old != candidates[row][col]
 }
+
+pub fn build_row_mask(
+    candidates: &Candidates,
+    row: usize,
+    digit_mask: u16,
+) -> u16{
+    let mut mask = 0u16;
+
+    for col in 0..9 {
+        if candidates[row][col] & digit_mask != 0 {
+            mask |= 1 << col;
+        }
+    }
+    mask
+}
+
+
+pub fn build_col_mask(
+    candidates: &Candidates,
+    col: usize,
+    digit_mask: u16,
+) -> u16 {
+    let mut mask = 0u16;
+
+    for row in 0..9 {
+        if candidates[row][col] & digit_mask != 0 {
+            mask |= 1 << row;
+        }
+    }
+    mask
+}

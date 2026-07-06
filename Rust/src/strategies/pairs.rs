@@ -74,6 +74,9 @@ pub fn find_naked_pairs_in_unit_fast(candidates: &mut Candidates, unit_cells: &[
                     }
                 }
             }
+            if changed {
+                return true;
+            }
         }
     }
 
@@ -134,6 +137,9 @@ pub fn find_hidden_pairs_in_unit(
                         }
                     }
                 }
+            }
+            if changed {
+                return true;
             }
         }
     }
