@@ -5,6 +5,8 @@ pub mod intersections;
 pub mod triples;
 pub mod fish;
 pub mod wing;
+pub mod bug;
+pub mod rectangles;
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 pub enum Technique {
@@ -16,5 +18,6 @@ pub enum Technique {
     HiddenTriple,
     PointingPair,
     BoxLineReduction,
-    XWing
+    XWing,
+    BugPlus1
 }

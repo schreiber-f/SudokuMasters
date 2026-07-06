@@ -7,3 +7,5 @@ pub mod intersections_tests;
 pub mod generator_tests;
 pub mod triples_tests;
 pub mod fish_tests;
+pub mod bug_tests;
+pub mod rectangles_tests;

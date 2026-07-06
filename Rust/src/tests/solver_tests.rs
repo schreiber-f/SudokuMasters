@@ -102,3 +102,22 @@ fn test_human_solver_pairs() {
     print_board(&board);
     println!("solve report {:?}", report);
 }
+
+#[test]
+fn test_human_solve_board() {
+    println!("testing human_solver_singles");
+    let mut board = generate_full_board();
+    println!("board before:");
+    print_board(&board);
+    dig_holes(&mut board, 30);
+
+    println!("board with holes:");
+    print_board(&board);
+
+    let report = human_solve(&mut board);
+
+    println!("board after:");
+    print_board(&board);
+    println!("solve report difficult board {:?}", report);
+    assert!(report.is_solved);
+}
