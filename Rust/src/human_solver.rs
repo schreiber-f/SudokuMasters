@@ -2,7 +2,7 @@ use crate::board::{Board, board_is_complete};
 use crate::candidates::{compute_candidates};
 use crate::strategies::singles::{apply_naked_single, apply_hidden_single};
 use crate::strategies::pairs::{apply_naked_pair, apply_hidden_pair};
-use crate::strategies::intersections::{apply_pointing_pair};
+use crate::strategies::intersections::{apply_pointing_pair, apply_box_line_reduction};
 use crate::strategies::{Technique};
 use std::collections::HashMap;
 
@@ -66,6 +66,14 @@ pub fn human_solve(board: &mut Board) -> SolveReport{
             continue;
         }
         println!("no pointing pair found");
+
+        if apply_box_line_reduction(&mut candidates) {
+            *counts
+                .entry(Technique::BoxLineReduction)
+                .or_insert(0) += 1;
+
+            continue;
+        }
 
         break;
     }

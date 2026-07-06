@@ -113,3 +113,10 @@ pub fn print_board(board: &Board) {
     }
     println!();
 }
+
+pub fn box_index(
+    row: usize,
+    col: usize,
+) -> usize {
+    (row / 3) * 3 + (col / 3)
+}

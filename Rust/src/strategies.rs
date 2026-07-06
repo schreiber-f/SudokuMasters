@@ -9,5 +9,6 @@ pub enum Technique {
     HiddenSingle,
     NakedPair,
     HiddenPair,
-    PointingPair
+    PointingPair,
+    BoxLineReduction
 }
