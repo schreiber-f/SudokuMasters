@@ -19,5 +19,6 @@ pub enum Technique {
     PointingPair,
     BoxLineReduction,
     XWing,
-    BugPlus1
+    BugPlus1,
+    UniqueRectangleT1
 }

@@ -1,6 +1,5 @@
 use crate::candidates::{count_bits, remove_candidates, Candidates};
 use crate::strategies::cell_utils::{box_cells, col_cells, row_cells};
-use crate::strategies::pairs::{find_hidden_pairs_in_unit, find_naked_pairs_in_unit_fast};
 
 pub fn find_naked_triple_in_unit(candidates: &mut Candidates, unit_cells: &[(usize, usize)]) -> bool {
     let mut changed = false;

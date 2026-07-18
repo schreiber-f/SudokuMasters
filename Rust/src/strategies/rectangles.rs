@@ -43,8 +43,9 @@ pub fn apply_unique_rectangle_type1(
                         }
 
 
-                        let mut pair_cells=0;
-                        let mut extra_cell=None;
+                        let mut pair_cells = 0;
+                        let mut extra_cell = None;
+                        
 
 
                         for i in 0..4 {

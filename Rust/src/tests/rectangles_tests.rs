@@ -49,7 +49,7 @@ fn test_unique_rectangle_type1(){
 
 
 #[test]
-fn test_no_unique_rectangle(){
+fn test_unique_rectangle(){
 
     let mut candidates =
         [[0u16;9];9];
@@ -61,6 +61,36 @@ fn test_no_unique_rectangle(){
 
     candidates[3][3]=pair;
     candidates[3][6]=pair;
+    candidates[6][3]=pair;
+
+
+    candidates[6][6]=
+        pair |
+            (1<<4) |
+            (1<<5);
+
+
+    assert!(
+        apply_unique_rectangle_type1(
+            &mut candidates
+        )
+    );
+
+}
+
+#[test]
+fn test_no_unique_rectangle(){
+
+    let mut candidates =
+        [[0u16;9];9];
+
+
+    let pair =
+        (1<<1)|(1<<8);
+
+
+    candidates[3][3]=pair;
+    candidates[3][6]=pair | (1<<6);
     candidates[6][3]=pair;
 
 
